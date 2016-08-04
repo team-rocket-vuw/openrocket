@@ -3,3 +3,5 @@ jdk:
   - oraclejdk7
 script:
  - "ant -buildfile build.xml clean check jar unittest"
+notifications:
+ slack: teamrocketvuw:aF6Clpsi2yMhZ8Z4sVSyRHKA
