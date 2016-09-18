@@ -186,5 +186,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="OpenRocket Swing" />
   </component>
 </module>

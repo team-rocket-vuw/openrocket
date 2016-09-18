@@ -1,5 +1,10 @@
 package net.sf.openrocket.gui.main;
 
+import net.sf.openrocket.util.BugException;
+import net.sf.openrocket.util.JarUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -11,12 +16,6 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import net.sf.openrocket.util.BugException;
-import net.sf.openrocket.util.JarUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ExampleDesignFile implements Comparable<ExampleDesignFile> {
 	
 	private final static Logger logger = LoggerFactory.getLogger(ExampleDesignFile.class);
@@ -24,7 +23,7 @@ public class ExampleDesignFile implements Comparable<ExampleDesignFile> {
 	private final URL url;
 	private final String name;
 	
-	private ExampleDesignFile(URL url, String name) {
+	public ExampleDesignFile(URL url, String name) {
 		this.url = url;
 		this.name = name;
 	}
@@ -94,7 +93,8 @@ public class ExampleDesignFile implements Comparable<ExampleDesignFile> {
 		for (int i = 0; i < files.length; i++) {
 			String name = files[i].getName();
 			try {
-				designs[i] = new ExampleDesignFile(files[i].toURI().toURL(),
+				URL url1 = files[i].toURI().toURL();
+				designs[i] = new ExampleDesignFile(url1,
 						name.substring(0, name.length() - 4));
 			} catch (MalformedURLException e) {
 				throw new BugException(e);
