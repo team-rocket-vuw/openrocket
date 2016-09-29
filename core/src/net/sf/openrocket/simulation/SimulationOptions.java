@@ -403,6 +403,10 @@ public class SimulationOptions implements ChangeSource, Cloneable {
 		 */
 		//		fireChangeEvent();
 	}
+
+	public double getMaxLaunchRodAngle(){
+		return this.MAX_LAUNCH_ROD_ANGLE;
+	}
 	
 	/**
 	 * Randomize the random seed value.

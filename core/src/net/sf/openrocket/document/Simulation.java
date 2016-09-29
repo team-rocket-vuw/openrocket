@@ -482,7 +482,9 @@ public class Simulation implements ChangeSource, Cloneable {
 		}
 	}
 	
-	
+	public void setSimulationOptions(SimulationOptions options){
+		this.options = options;
+	}
 	
 	@Override
 	public void addChangeListener(StateChangeListener listener) {
