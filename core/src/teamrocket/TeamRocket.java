@@ -1,9 +1,8 @@
-import java.io.File;
+package teamrocket;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-
 import net.sf.openrocket.database.Databases;
 import net.sf.openrocket.document.OpenRocketDocument;
 import net.sf.openrocket.document.Simulation;
@@ -16,25 +15,53 @@ import net.sf.openrocket.simulation.exception.SimulationException;
 import net.sf.openrocket.simulation.listeners.AbstractSimulationListener;
 import net.sf.openrocket.simulation.listeners.SimulationListener;
 import net.sf.openrocket.startup.Application;
-import net.sf.openrocket.startup.ExceptionHandler;
 import net.sf.openrocket.startup.GuiModule;
 import net.sf.openrocket.util.ArrayList;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class TeamRocket {
 	private OpenRocketDocument document;
 	private ArrayList<FlightData> listOfFlightData;
+	private final PrintStream outputStream = System.out;
 
-	public TeamRocket(){
+	private TeamRocket(){
+		disableOutput();
+
 		loadFile();
 		runFileSimulations();
-		printFlightData();
+
+		setOutputStream(outputStream);
+	}
+
+	private void setOutputStream(PrintStream outputStream) {
+		System.setOut(outputStream);
+	}
+
+	private void disableOutput() {
+		PrintStream dummyStream    = new PrintStream(new OutputStream(){
+			public void write(int b) {}
+		});
+
+		setOutputStream(dummyStream);
 	}
 
 	public static void main(String[] args) throws RocketLoadException {
-		TeamRocket teamRocket = new TeamRocket();
+		run();
 	}
 
-	public void runFileSimulations(){
+	public static String run() {
+		System.out.println("Started simulations");
+		TeamRocket tr = new TeamRocket();
+
+		System.out.println("Ended simulations");
+
+		return tr.getStringifiedFlightData();
+	}
+
+	private void runFileSimulations(){
 		for (Simulation s : document.getSimulations()) {
 			SimulationListener simulationListener = new AbstractSimulationListener();
 
@@ -43,16 +70,17 @@ public class TeamRocket {
 	}
 
 	public ArrayList<FlightData> simulateMultipleLaunchAngles(SimulationListener simulationListener, Simulation s){
-		ArrayList<FlightData> fd = new ArrayList<FlightData>();
+		ArrayList<FlightData> fd = new ArrayList<>();
 		try {
 			SimulationOptions simulationOptions = s.getOptions();
 
 			//Simulate for each degree between 0 and 45 degrees
-			for(int i = 0; i <= 45; i++) {
-				simulationOptions.setLaunchRodAngle(Math.toRadians(i));
+			for(double launchAngle = 0; launchAngle <= 45; launchAngle++) {
+				simulationOptions.setLaunchRodAngle(Math.toRadians(launchAngle));
 				s.setSimulationOptions(simulationOptions);
 				s.simulate(simulationListener);
 				FlightData f = s.getSimulatedData();
+				f.setLaunchAngle(launchAngle);
 				fd.add(f);
 			}
 		} catch (SimulationException e) {
@@ -83,11 +111,24 @@ public class TeamRocket {
 		}
 	}
 
-	public void printFlightData(){
-		for(int i = 0; i < listOfFlightData.size(); i++){
-			//TODO: print angle, for now it's simulating at every degree so list index works but not if not at every angle
-			System.out.printf("Launch angle: %d degrees, Max Altitude: %f, Flight time: %f\n",
-					i, listOfFlightData.get(i).getMaxAltitude(), listOfFlightData.get(i).getFlightTime());
+	public String getStringifiedFlightData() {
+		String stringifiedFlightData = "{";
+		for (FlightData fd: listOfFlightData) {
+			stringifiedFlightData +=
+				"\n\tlaunch: {\n\t\t" +
+					"launchAngle: " + fd.getLaunchAngle() + ",\n\t\t" +
+					"launchStatistics: {\n" +
+						fd.toString() +
+					"\n\t\t}" +
+				"\n\t}";
 		}
+
+		stringifiedFlightData += "\n}";
+
+		return stringifiedFlightData;
+	}
+
+	private class DataTuple {
+
 	}
 }

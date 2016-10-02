@@ -38,7 +38,8 @@ public abstract class AsynchronousDatabaseLoader {
 			throw new IllegalStateException("Already called startLoading");
 		}
 		startedLoading = true;
-		new LoadingThread().start();
+//		new LoadingThread().start();
+		doLoad();
 	}
 	
 	
@@ -115,16 +116,16 @@ public abstract class AsynchronousDatabaseLoader {
 	/**
 	 * Background thread for loading the database.
 	 */
-	private class LoadingThread extends Thread {
-		private LoadingThread() {
-			this.setName("DatabaseLoadingThread");
-			this.setPriority(MIN_PRIORITY);
-		}
-		
-		@Override
-		public void run() {
-			doLoad();
-		}
-	}
+//	private class LoadingThread extends Thread {
+//		private LoadingThread() {
+//			this.setName("DatabaseLoadingThread");
+//			this.setPriority(MIN_PRIORITY);
+//		}
+//
+//		@Override
+//		public void run() {
+//			doLoad();
+//		}
+//	}
 	
 }

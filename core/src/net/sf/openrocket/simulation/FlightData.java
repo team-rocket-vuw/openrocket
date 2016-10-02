@@ -1,14 +1,13 @@
 package net.sf.openrocket.simulation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.openrocket.aerodynamics.WarningSet;
 import net.sf.openrocket.util.MathUtil;
 import net.sf.openrocket.util.Mutable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A collection of various flight data.  This is the result of a simulation, or importing
@@ -51,8 +50,9 @@ public class FlightData {
 	private double groundHitVelocity = Double.NaN;
 	private double launchRodVelocity = Double.NaN;
 	private double deploymentVelocity = Double.NaN;
-	
-	
+	private double launchAngle = -1;
+
+
 	/**
 	 * Create a FlightData object with no content.  The resulting object is mutable.
 	 */
@@ -309,5 +309,26 @@ public class FlightData {
 		}
 		
 		return max;
+	}
+
+	@Override
+	public String toString() {
+		return 	"\t\t\tmaxAltitude: " + maxAltitude +
+				",\n\t\t\tmaxVelocity: " + maxVelocity +
+				",\n\t\t\tmaxAcceleration: " + maxAcceleration +
+				",\n\t\t\tmaxMachNumber: " + maxMachNumber +
+				",\n\t\t\ttimeToApogee: " + timeToApogee +
+				",\n\t\t\tflightTime: " + flightTime +
+				",\n\t\t\tgroundHitVelocity: " + groundHitVelocity +
+				",\n\t\t\tlaunchRodVelocity: " + launchRodVelocity +
+				",\n\t\t\tdeploymentVelocity: " + deploymentVelocity;
+	}
+
+	public void setLaunchAngle(double launchAngle) {
+		this.launchAngle = launchAngle;
+	}
+
+	public double getLaunchAngle() {
+		return launchAngle;
 	}
 }
