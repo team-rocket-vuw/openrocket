@@ -50,8 +50,6 @@ public class FlightData {
 	private double groundHitVelocity = Double.NaN;
 	private double launchRodVelocity = Double.NaN;
 	private double deploymentVelocity = Double.NaN;
-	private double launchAngle = -1;
-
 
 	/**
 	 * Create a FlightData object with no content.  The resulting object is mutable.
@@ -311,24 +309,41 @@ public class FlightData {
 		return max;
 	}
 
-	@Override
-	public String toString() {
-		return 	"\t\t\tmaxAltitude: " + maxAltitude +
-				",\n\t\t\tmaxVelocity: " + maxVelocity +
-				",\n\t\t\tmaxAcceleration: " + maxAcceleration +
-				",\n\t\t\tmaxMachNumber: " + maxMachNumber +
-				",\n\t\t\ttimeToApogee: " + timeToApogee +
-				",\n\t\t\tflightTime: " + flightTime +
-				",\n\t\t\tgroundHitVelocity: " + groundHitVelocity +
-				",\n\t\t\tlaunchRodVelocity: " + launchRodVelocity +
-				",\n\t\t\tdeploymentVelocity: " + deploymentVelocity;
-	}
+	/////////////////////
+	///  TEAM ROCKET  ///
+	/// Modifications ///
+	/////////////////////
 
-	public void setLaunchAngle(double launchAngle) {
+	private double launchAngle;
+
+    /**
+     * Sets launch angle.
+     *
+     * @param launchAngle the launch angle
+     */
+    public void setLaunchAngle(double launchAngle) {
 		this.launchAngle = launchAngle;
 	}
 
-	public double getLaunchAngle() {
+    /**
+     * Gets launch angle.
+     *
+     * @return the launch angle
+     */
+    public double getLaunchAngle() {
 		return launchAngle;
+	}
+
+	@Override
+	public String toString() {
+		return 	"\"maxAltitude\": " + maxAltitude +
+				",\"maxVelocity\": " + maxVelocity +
+				",\"maxAcceleration\": " + maxAcceleration +
+				",\"maxMachNumber\": " + maxMachNumber +
+				",\"timeToApogee\": " + timeToApogee +
+				",\"flightTime\": " + flightTime +
+				",\"groundHitVelocity\": " + groundHitVelocity +
+				",\"launchRodVelocity\": " + launchRodVelocity +
+				",\"deploymentVelocity\": " + deploymentVelocity;
 	}
 }

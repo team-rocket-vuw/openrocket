@@ -12,6 +12,8 @@ public abstract class AsynchronousDatabaseLoader {
 	private volatile boolean startedLoading = false;
 	private volatile boolean endedLoading = false;
 	private volatile boolean inUse = false;
+
+	private boolean forceSynchronousLoading = true;
 	
 	/**
 	 * Sole constructor.
@@ -38,8 +40,12 @@ public abstract class AsynchronousDatabaseLoader {
 			throw new IllegalStateException("Already called startLoading");
 		}
 		startedLoading = true;
-//		new LoadingThread().start();
-		doLoad();
+
+		if (forceSynchronousLoading) {
+			doLoad();
+		} else {
+			new LoadingThread().start();
+		}
 	}
 	
 	
@@ -116,16 +122,16 @@ public abstract class AsynchronousDatabaseLoader {
 	/**
 	 * Background thread for loading the database.
 	 */
-//	private class LoadingThread extends Thread {
-//		private LoadingThread() {
-//			this.setName("DatabaseLoadingThread");
-//			this.setPriority(MIN_PRIORITY);
-//		}
-//
-//		@Override
-//		public void run() {
-//			doLoad();
-//		}
-//	}
+	private class LoadingThread extends Thread {
+		private LoadingThread() {
+			this.setName("DatabaseLoadingThread");
+			this.setPriority(MIN_PRIORITY);
+		}
+
+		@Override
+		public void run() {
+			doLoad();
+		}
+	}
 	
 }
