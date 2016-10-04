@@ -1,11 +1,5 @@
 package net.sf.openrocket.simulation;
 
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.EventObject;
-import java.util.List;
-import java.util.Random;
-
 import net.sf.openrocket.aerodynamics.BarrowmanCalculator;
 import net.sf.openrocket.formatting.MotorDescriptionSubstitutor;
 import net.sf.openrocket.masscalc.BasicMassCalculator;
@@ -17,16 +11,12 @@ import net.sf.openrocket.models.wind.PinkNoiseWindModel;
 import net.sf.openrocket.rocketcomponent.Rocket;
 import net.sf.openrocket.startup.Application;
 import net.sf.openrocket.startup.Preferences;
-import net.sf.openrocket.util.BugException;
-import net.sf.openrocket.util.ChangeSource;
-import net.sf.openrocket.util.GeodeticComputationStrategy;
-import net.sf.openrocket.util.MathUtil;
-import net.sf.openrocket.util.StateChangeListener;
-import net.sf.openrocket.util.Utils;
-import net.sf.openrocket.util.WorldCoordinate;
-
+import net.sf.openrocket.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.*;
 
 /**
  * A class holding simulation options in basic parameter form and which functions
