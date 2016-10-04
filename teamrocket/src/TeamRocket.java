@@ -28,24 +28,24 @@ import java.io.File;
  * By Marcel van Workum & Lauren Hucker
  */
 public class TeamRocket {
-    private String fileName;
+	private String fileName;
 
-    /**
-     * Instantiate a new team rocket instance.
-     *
-     * @param fileName name of ork file to be loaded
-     */
-    public TeamRocket(String fileName){
+	/**
+	 * Instantiate a new team rocket instance.
+	 *
+	 * @param fileName name of ork file to be loaded
+	 */
+	public TeamRocket(String fileName){
 		this.fileName = fileName;
 	}
 
-    /**
-     * Executes the simulations
-     *
-     * TODO this should take in a variable of config params so that we can run different types of simulations/pass in weather/gps location
-     *
-     * @return JSON string containing simulation results
-     */
+	/**
+	 * Executes the simulations
+	 *
+	 * TODO this should take in a variable of config params so that we can run different types of simulations/pass in weather/gps location
+	 *
+	 * @return JSON string containing simulation results
+	 */
 	public String runSimulations() {
 		System.out.println("Started simulations");
 
@@ -57,18 +57,18 @@ public class TeamRocket {
 	}
 
 	private ArrayList<SimulationData> performSimulations() {
-        // First we need to instantiate all of the open rocket dependencies
-        dangerouslyInstantiateOpenRocketDependencies();
+		// First we need to instantiate all of the open rocket dependencies
+		dangerouslyInstantiateOpenRocketDependencies();
 
-        // And then create a simulation runner, which will handle all of the simulations
-        // We pass in the loaded .ork file into this
-        SimulationRunner simulationRunner = new SimulationRunner(loadOpenRocketDocument());
+		// And then create a simulation runner, which will handle all of the simulations
+		// We pass in the loaded .ork file into this
+		SimulationRunner simulationRunner = new SimulationRunner(loadOpenRocketDocument());
 
-        return simulationRunner.run();
+		return simulationRunner.run();
 	}
 
 	private OpenRocketDocument loadOpenRocketDocument(){
-        // Read the .ork file
+		// Read the .ork file
 		File file = new File(fileName);
 
 		GeneralRocketLoader loader = new GeneralRocketLoader(file);
@@ -87,19 +87,19 @@ public class TeamRocket {
 	    This is very hacky, but essentially is instantiates all of the dependencies needed to make OpenRocket function
 	 */
 	private void dangerouslyInstantiateOpenRocketDependencies() {
-        // Note that the GuiModule is not the GUI itself, but just a container for the GUI's dependencies.
-        // This is required because it loads the component and motor databases
+		// Note that the GuiModule is not the GUI itself, but just a container for the GUI's dependencies.
+		// This is required because it loads the component and motor databases
 		GuiModule guiModule = new GuiModule();
 
-        // Again, this is simply required for the application to load.
+		// Again, this is simply required for the application to load.
 		Module pluginModule = new PluginModule();
 
-        // Set up the injectors
+		// Set up the injectors
 		Injector injector = Guice.createInjector(guiModule, pluginModule);
 		Application.setInjector(injector);
 
-        // Asynchronously loads the component presets and motor database
-        // However the motor database has been made to load synchronously to ensure it works with Python
+		// Asynchronously loads the component presets and motor database
+		// However the motor database has been made to load synchronously to ensure it works with Python
 		guiModule.startLoader();
 	}
 

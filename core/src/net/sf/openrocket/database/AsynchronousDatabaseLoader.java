@@ -31,7 +31,10 @@ public abstract class AsynchronousDatabaseLoader {
 	
 	
 	/**
-	 * Start loading the database.  Creates a new thread for the loading and returns immediately.
+	 * Start loading the database.
+	 *
+	 * This will either create a new thread for the loading and returns immediately.
+	 * or if synchronous loading is being force, will load the database sequentially
 	 * 
 	 * @throws  IllegalStateException	if this method has already been called.
 	 */

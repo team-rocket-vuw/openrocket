@@ -26,7 +26,7 @@ public class JSONFormatter {
 
             stringifiedSimulationData += String.format("\"%s\": { ", simulationData.getSimulation().getName());
 
-            stringifiedSimulationData += ConvertFlightData(simulationData.getFlightDataList());
+            stringifiedSimulationData += convertFlightData(simulationData.getFlightDataList());
 
             // add comma to ending bracket, except for last occurrence
             if (simulationDataIndex != simulationDataList.size() - 1) {
@@ -41,7 +41,7 @@ public class JSONFormatter {
         return stringifiedSimulationData;
     }
 
-    private static String ConvertFlightData(ArrayList<FlightData> flightDataList) {
+    private static String convertFlightData(ArrayList<FlightData> flightDataList) {
         String stringifiedSimulationData = "";
 
         for (int flightDataIndex = 0; flightDataIndex < flightDataList.size(); flightDataIndex++) {

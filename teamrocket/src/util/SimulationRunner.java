@@ -18,7 +18,7 @@ import net.sf.openrocket.util.ArrayList;
  */
 public class SimulationRunner {
     private OpenRocketDocument openRocketDocument;
-    private SimulationListener simulationListener = new AbstractSimulationListener();
+    private final SimulationListener simulationListener = new AbstractSimulationListener();
 
     public SimulationRunner(OpenRocketDocument openRocketDocument) {
         this.openRocketDocument = openRocketDocument;
