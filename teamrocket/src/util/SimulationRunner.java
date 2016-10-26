@@ -4,12 +4,17 @@ import data.SimulationData;
 import net.sf.openrocket.document.OpenRocketDocument;
 import net.sf.openrocket.document.Simulation;
 import net.sf.openrocket.simulation.FlightData;
+import net.sf.openrocket.simulation.FlightDataBranch;
 import net.sf.openrocket.simulation.SimulationOptions;
 import net.sf.openrocket.simulation.exception.SimulationException;
 import net.sf.openrocket.simulation.listeners.AbstractSimulationListener;
 import net.sf.openrocket.simulation.listeners.SimulationListener;
 import net.sf.openrocket.util.ArrayList;
 import org.json.simple.JSONObject;
+
+import static net.sf.openrocket.simulation.FlightDataType.TYPE_LATITUDE;
+import static net.sf.openrocket.simulation.FlightDataType.TYPE_LONGITUDE;
+
 
 /**
  * Utility class to perform a variety of openrocket simulations
@@ -51,8 +56,8 @@ public class SimulationRunner {
         double angleStep = 1.0;
 
         for (Simulation simulation : openRocketDocument.getSimulations()) {
-            ArrayList<FlightData> flightData = simulateMultipleLaunchAngles(simulation, startAngle, endAngle, angleStep);
             setWeatherConditions(this.weatherDataJson, simulation.getOptions());
+            ArrayList<FlightData> flightData = simulateMultipleLaunchAngles(simulation, startAngle, endAngle, angleStep);
             simulationDataList.add(new SimulationData(simulation, flightData));
         }
 
@@ -79,6 +84,7 @@ public class SimulationRunner {
                 f.setLaunchAngle(launchAngle);
 
                 flightDataList.add(f);
+                f.setLandingCoord(getLandingCoord(simulation));
             }
         } catch (SimulationException e) {
             System.err.println(e.getMessage());
@@ -100,6 +106,17 @@ public class SimulationRunner {
         simulationOptions.setLaunchPressure((double) main.get("pressure"));
         simulationOptions.setLaunchTemperature((double) main.get("temp"));
         //simulationOptions.setLaunchIntoWind(true); //Do we wanna do this??
+    }
+
+    public String getLandingCoord(Simulation simulation){
+        //TODO: check these values are legit
+        double initialLatitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lat");
+        double initialLongitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lon");
+
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+
+        return String.format("(%.2f,%.2f)", (flightDataBranch.getLast(TYPE_LONGITUDE) - initialLongitude),
+                (flightDataBranch.getLast(TYPE_LATITUDE) - initialLatitude));
     }
 
 }

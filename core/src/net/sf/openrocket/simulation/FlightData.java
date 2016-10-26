@@ -50,6 +50,7 @@ public class FlightData {
 	private double groundHitVelocity = Double.NaN;
 	private double launchRodVelocity = Double.NaN;
 	private double deploymentVelocity = Double.NaN;
+	private String landingCoord = "";
 
 	/**
 	 * Create a FlightData object with no content.  The resulting object is mutable.
@@ -334,9 +335,14 @@ public class FlightData {
 		return launchAngle;
 	}
 
+	public void setLandingCoord(String coord){
+		this.landingCoord = coord;
+	}
+
 	@Override
 	public String toString() {
 		return 	"\"maxAltitude\": " + maxAltitude +
+				",\"landingCoord\": " + landingCoord +
 				",\"maxVelocity\": " + maxVelocity +
 				",\"maxAcceleration\": " + maxAcceleration +
 				",\"maxMachNumber\": " + maxMachNumber +
