@@ -9,6 +9,7 @@ import net.sf.openrocket.simulation.exception.SimulationException;
 import net.sf.openrocket.simulation.listeners.AbstractSimulationListener;
 import net.sf.openrocket.simulation.listeners.SimulationListener;
 import net.sf.openrocket.util.ArrayList;
+import org.json.simple.JSONObject;
 
 /**
  * Utility class to perform a variety of openrocket simulations
@@ -75,4 +76,19 @@ public class SimulationRunner {
 
         return flightDataList;
     }
+
+    public void setWeatherConditions(JSONObject conditions, SimulationOptions simulationOptions){
+        JSONObject main = (JSONObject)conditions.get("main");
+        JSONObject wind = (JSONObject)conditions.get("wind");
+        JSONObject coord = (JSONObject)conditions.get("coord");
+
+        simulationOptions.setLaunchLongitude((double) coord.get("lon"));
+        simulationOptions.setLaunchLatitude((double) coord.get("lat"));
+        simulationOptions.setWindSpeedAverage((double) wind.get("speed"));
+        simulationOptions.setWindDirection((double) wind.get("direction"));
+        simulationOptions.setLaunchPressure((double) main.get("pressure"));
+        simulationOptions.setLaunchTemperature((double) main.get("temp"));
+        //simulationOptions.setLaunchIntoWind(true); //Do we wanna do this??
+    }
+
 }
