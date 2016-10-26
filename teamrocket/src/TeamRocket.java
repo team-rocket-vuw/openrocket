@@ -53,7 +53,12 @@ public class TeamRocket {
 
 		System.out.println("Ended simulations");
 
-		return JSONFormatter.stringifySimulationData(simulationData);
+		String stringifySimulationData = JSONFormatter.stringifySimulationData(simulationData);
+
+		// needed to convert NaN to a javascript friendly value
+		String safeString = stringifySimulationData.replace("NaN", "-1");
+
+		return safeString;
 	}
 
 	private ArrayList<SimulationData> performSimulations() {
