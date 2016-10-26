@@ -78,6 +78,7 @@ public class SimulationRunner {
     }
 
     public void setWeatherConditions(JSONObject conditions, SimulationOptions simulationOptions){
+
         JSONObject main = (JSONObject)conditions.get("main");
         JSONObject wind = (JSONObject)conditions.get("wind");
         JSONObject coord = (JSONObject)conditions.get("coord");
@@ -85,7 +86,7 @@ public class SimulationRunner {
         simulationOptions.setLaunchLongitude((double) coord.get("lon"));
         simulationOptions.setLaunchLatitude((double) coord.get("lat"));
         simulationOptions.setWindSpeedAverage((double) wind.get("speed"));
-        simulationOptions.setWindDirection((double) wind.get("direction"));
+        simulationOptions.setWindDirection((double) wind.get("deg"));
         simulationOptions.setLaunchPressure((double) main.get("pressure"));
         simulationOptions.setLaunchTemperature((double) main.get("temp"));
         //simulationOptions.setLaunchIntoWind(true); //Do we wanna do this??
