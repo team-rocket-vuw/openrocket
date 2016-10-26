@@ -67,7 +67,7 @@ public class TeamRocket {
 		// And then create a simulation runner, which will handle all of the simulations
 		// We pass in the loaded .ork file into this
 		SimulationRunner simulationRunner = new SimulationRunner(loadOpenRocketDocument());
-		simulationRunner.setWeatherData(this.parseWeatherData(JsonString));
+		simulationRunner.setWeatherConditions(this.parseWeatherData(JsonString));
 		return simulationRunner.run();
 	}
 
