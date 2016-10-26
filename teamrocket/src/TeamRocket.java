@@ -6,9 +6,13 @@ import net.sf.openrocket.document.OpenRocketDocument;
 import net.sf.openrocket.file.GeneralRocketLoader;
 import net.sf.openrocket.file.RocketLoadException;
 import net.sf.openrocket.plugin.PluginModule;
+import net.sf.openrocket.simulation.SimulationOptions;
 import net.sf.openrocket.startup.Application;
 import net.sf.openrocket.startup.GuiModule;
 import net.sf.openrocket.util.ArrayList;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import util.JSONFormatter;
 import util.SimulationRunner;
 
@@ -46,24 +50,24 @@ public class TeamRocket {
 	 *
 	 * @return JSON string containing simulation results
 	 */
-	public String runSimulations() {
+	public String runSimulations(String JsonString) {
 		System.out.println("Started simulations");
 
-		ArrayList<SimulationData> simulationData = performSimulations();
+		ArrayList<SimulationData> simulationData = performSimulations(JsonString);
 
 		System.out.println("Ended simulations");
 
 		return JSONFormatter.stringifySimulationData(simulationData);
 	}
 
-	private ArrayList<SimulationData> performSimulations() {
+	private ArrayList<SimulationData> performSimulations(String JsonString) {
 		// First we need to instantiate all of the open rocket dependencies
 		dangerouslyInstantiateOpenRocketDependencies();
 
 		// And then create a simulation runner, which will handle all of the simulations
 		// We pass in the loaded .ork file into this
 		SimulationRunner simulationRunner = new SimulationRunner(loadOpenRocketDocument());
-
+		simulationRunner.setWeatherData(this.parseWeatherData(JsonString));
 		return simulationRunner.run();
 	}
 
@@ -101,6 +105,16 @@ public class TeamRocket {
 		// Asynchronously loads the component presets and motor database
 		// However the motor database has been made to load synchronously to ensure it works with Python
 		guiModule.startLoader();
+	}
+
+	public JSONObject parseWeatherData(String JsonString){
+		JSONParser parser = new JSONParser();
+		try {
+			return (JSONObject) parser.parse(JsonString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	// Entry point required to compile JAR artifact

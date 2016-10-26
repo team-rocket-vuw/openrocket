@@ -20,9 +20,19 @@ import org.json.simple.JSONObject;
 public class SimulationRunner {
     private OpenRocketDocument openRocketDocument;
     private final SimulationListener simulationListener = new AbstractSimulationListener();
+    private JSONObject weatherDataJson;
 
     public SimulationRunner(OpenRocketDocument openRocketDocument) {
         this.openRocketDocument = openRocketDocument;
+    }
+
+    public SimulationRunner(OpenRocketDocument openRocketDocument, JSONObject weatherDataJson) {
+        this.openRocketDocument = openRocketDocument;
+        this.weatherDataJson = weatherDataJson;
+    }
+
+    public void setWeatherData(JSONObject weatherDataJson){
+        this.weatherDataJson = weatherDataJson;
     }
 
     /**
@@ -42,7 +52,7 @@ public class SimulationRunner {
 
         for (Simulation simulation : openRocketDocument.getSimulations()) {
             ArrayList<FlightData> flightData = simulateMultipleLaunchAngles(simulation, startAngle, endAngle, angleStep);
-
+            setWeatherConditions(this.weatherDataJson, simulation.getOptions());
             simulationDataList.add(new SimulationData(simulation, flightData));
         }
 
