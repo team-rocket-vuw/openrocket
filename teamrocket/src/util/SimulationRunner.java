@@ -14,8 +14,7 @@ import net.sf.openrocket.util.GeodeticComputationStrategy;
 import net.sf.openrocket.util.WorldCoordinate;
 import org.json.simple.JSONObject;
 
-import static net.sf.openrocket.simulation.FlightDataType.TYPE_LATITUDE;
-import static net.sf.openrocket.simulation.FlightDataType.TYPE_LONGITUDE;
+import static net.sf.openrocket.simulation.FlightDataType.*;
 
 
 /**
@@ -88,6 +87,8 @@ public class SimulationRunner {
                 FlightData f = simulation.getSimulatedData();
                 f.setLaunchAngle(launchAngle);
                 f.setLandingCoord(getLandingCoord(simulation));
+                f.setPositionUpwind(getPositionUpwind(simulation));
+                f.setLateralDistance(getLateralDistance(simulation));
                 flightDataList.add(f);
 
             }
@@ -138,9 +139,20 @@ public class SimulationRunner {
         System.out.println("Diff distance:  " + distFrom(launchPos.getLatitudeDeg(),launchPos.getLongitudeDeg(),
                 landingPos.getLatitudeDeg(), landingPos.getLongitudeDeg()));
         System.out.println("Cartisian Coord: " + toCartisianCoord(diffPos));
+        System.out.println("Position Upwind: " + getPositionUpwind(simulation));
         System.out.println();
 
         return coordToMeters(landingPos);
+    }
+
+    public double getPositionUpwind(Simulation simulation){
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+        return flightDataBranch.getLast(TYPE_POSITION_X);
+    }
+
+    public double getLateralDistance(Simulation simulation){
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+        return flightDataBranch.getLast(TYPE_POSITION_XY);
     }
 
     public String test(){

@@ -51,6 +51,9 @@ public class FlightData {
 	private double launchRodVelocity = Double.NaN;
 	private double deploymentVelocity = Double.NaN;
 	private String landingCoord = "";
+	private double positionUpwind = Double.NaN;
+	private double lateralDistance = Double.NaN;
+
 
 	/**
 	 * Create a FlightData object with no content.  The resulting object is mutable.
@@ -339,10 +342,21 @@ public class FlightData {
 		this.landingCoord = coord;
 	}
 
+	public void setPositionUpwind(double position){
+		this.positionUpwind = position;
+	}
+
+	public void setLateralDistance(double distance){
+		this.lateralDistance = distance;
+	}
+
+
 	@Override
 	public String toString() {
 		return 	"\"maxAltitude\": " + maxAltitude +
 				",\"landingCoord\": " + landingCoord +
+				",\"positionUpwind\": " + positionUpwind +
+				",\"lateralDistance\": " + lateralDistance +
 				",\"maxVelocity\": " + maxVelocity +
 				",\"maxAcceleration\": " + maxAcceleration +
 				",\"maxMachNumber\": " + maxMachNumber +
