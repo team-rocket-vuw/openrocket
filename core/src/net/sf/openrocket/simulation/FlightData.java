@@ -53,6 +53,7 @@ public class FlightData {
 	private String landingCoord = "";
 	private double positionUpwind = Double.NaN;
 	private double lateralDistance = Double.NaN;
+	private List<String> flightCoords = new ArrayList<String>();
 
 
 	/**
@@ -350,11 +351,14 @@ public class FlightData {
 		this.lateralDistance = distance;
 	}
 
+	public void setFlightCoords(List<String> flightCoords) { this.flightCoords = flightCoords; }
+
 
 	@Override
 	public String toString() {
 		return 	"\"maxAltitude\": " + maxAltitude +
 				",\"landingCoord\": " + landingCoord +
+				",\"flightCoords\": " + flightCoords +
 				",\"positionUpwind\": " + positionUpwind +
 				",\"lateralDistance\": " + lateralDistance +
 				",\"maxVelocity\": " + maxVelocity +

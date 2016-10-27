@@ -14,6 +14,9 @@ import net.sf.openrocket.util.GeodeticComputationStrategy;
 import net.sf.openrocket.util.WorldCoordinate;
 import org.json.simple.JSONObject;
 
+import java.lang.reflect.Array;
+import java.util.List;
+
 import static net.sf.openrocket.simulation.FlightDataType.*;
 
 
@@ -83,12 +86,18 @@ public class SimulationRunner {
                 // Perform the simulation
                 simulation.simulate(simulationListener);
 
+
+
+                System.out.println(getFlightCoords(simulation).size());
+                System.out.println(getFlightCoords(simulation).toString());
+
                 // Get the result of the simulation and set launch angle to be stored with flight data
                 FlightData f = simulation.getSimulatedData();
                 f.setLaunchAngle(launchAngle);
-                f.setLandingCoord(getLandingCoord(simulation));
+                //f.setLandingCoord(getLandingCoord(simulation));
                 f.setPositionUpwind(getPositionUpwind(simulation));
                 f.setLateralDistance(getLateralDistance(simulation));
+                f.setFlightCoords(getFlightCoords(simulation));
                 flightDataList.add(f);
 
             }
@@ -111,14 +120,29 @@ public class SimulationRunner {
         simulationOptions.setWindDirection((double) wind.get("deg"));
         simulationOptions.setLaunchPressure((double) main.get("pressure"));
         simulationOptions.setLaunchTemperature((double) main.get("temp"));
+        simulationOptions.setLaunchIntoWind(true); //Do we wanna do this??
 
         return simulationOptions;
-        //simulationOptions.setLaunchIntoWind(true); //Do we wanna do this??
+
+    }
+
+    public List<String> getFlightCoords(Simulation simulation){
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+        List<Double> altitudes = flightDataBranch.get(TYPE_ALTITUDE);
+        List<Double> positions = flightDataBranch.get(TYPE_POSITION_X);
+
+        List<String> coords = new ArrayList<String>();
+        for(int i = 0; i < altitudes.size(); i+=5){
+            String coord = String.format("(%f,%f)", positions.get(i), altitudes.get(i));
+            coords.add(coord);
+        }
+        return coords;
     }
 
     public String getLandingCoord(Simulation simulation){
         //TODO: check these values are legit - They're not....
         FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+
 
         SimulationStatus status = new SimulationStatus(simulation.getConfiguration(), new MotorInstanceConfiguration(), (simulation.getSimulatedConditions().toSimulationConditions()));
         WorldCoordinate worldPos = status.getRocketWorldPosition();
@@ -131,15 +155,6 @@ public class SimulationRunner {
         WorldCoordinate landingPos = new WorldCoordinate(flightDataBranch.getLast(TYPE_LONGITUDE), flightDataBranch.getLast(TYPE_LATITUDE), 0);
         WorldCoordinate diffPos = getifferenceBetweenCoords(launchPos, landingPos);
 
-        System.out.println("Geodetic coord: " + launch);
-        System.out.println("Launch pos " + launchPos);
-        System.out.println("Landing pos:  " + landingPos);
-        System.out.println("Diff pos:  " + diffPos);
-        System.out.println("Diff coord:  " + coordToMeters(diffPos));
-        System.out.println("Diff distance:  " + distFrom(launchPos.getLatitudeDeg(),launchPos.getLongitudeDeg(),
-                landingPos.getLatitudeDeg(), landingPos.getLongitudeDeg()));
-        System.out.println("Cartisian Coord: " + toCartisianCoord(diffPos));
-        System.out.println("Position Upwind: " + getPositionUpwind(simulation));
         System.out.println();
 
         return coordToMeters(landingPos);
@@ -150,9 +165,28 @@ public class SimulationRunner {
         return flightDataBranch.getLast(TYPE_POSITION_X);
     }
 
+    public double getPositionParallelToWind(Simulation simulation){
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+        return flightDataBranch.getLast(TYPE_POSITION_Y);
+    }
+
     public double getLateralDistance(Simulation simulation){
         FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
         return flightDataBranch.getLast(TYPE_POSITION_XY);
+    }
+
+    public double getLateralDirection(Simulation simulation){
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
+        return flightDataBranch.getLast(TYPE_POSITION_DIRECTION);
+    }
+
+    public String getCoords(Double distance, Double direction){
+        double x = distance;
+        System.out.println("Direction: " + direction);
+        //TODO: FIX
+        double y = x*Math.sin(direction);
+        return String.format("(%f,%f)", x, y);
+
     }
 
     public String test(){
