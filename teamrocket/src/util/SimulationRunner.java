@@ -3,8 +3,6 @@ package util;
 import data.SimulationData;
 import net.sf.openrocket.document.OpenRocketDocument;
 import net.sf.openrocket.document.Simulation;
-import net.sf.openrocket.models.wind.PinkNoiseWindModel;
-import net.sf.openrocket.models.wind.WindModel;
 import net.sf.openrocket.motor.MotorInstanceConfiguration;
 import net.sf.openrocket.simulation.*;
 import net.sf.openrocket.simulation.exception.SimulationException;
@@ -89,20 +87,14 @@ public class SimulationRunner {
                 // Get the result of the simulation and set launch angle to be stored with flight data
                 FlightData f = simulation.getSimulatedData();
                 f.setLaunchAngle(launchAngle);
-                f.setLandingCoord(getLandingCoord2(simulation));
+                f.setLandingCoord(getLandingCoord(simulation));
                 flightDataList.add(f);
-
-                System.out.println();
-                System.out.println(getLandingCoord(simulation));
-                System.out.println(getLandingCoord2(simulation));
-                System.out.println(getLandingCoord3(simulation));
-                System.out.println();
 
             }
         } catch (SimulationException e) {
             System.err.println(e.getMessage());
         }
-
+        System.out.println(test());
         return flightDataList;
     }
 
@@ -124,68 +116,74 @@ public class SimulationRunner {
     }
 
     public String getLandingCoord(Simulation simulation){
-        //TODO: check these values are legit
-        double initialLatitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lat");
-        double initialLongitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lon");
+        //TODO: check these values are legit - They're not....
+        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
 
         SimulationStatus status = new SimulationStatus(simulation.getConfiguration(), new MotorInstanceConfiguration(), (simulation.getSimulatedConditions().toSimulationConditions()));
-        WorldCoordinate coord = status.getRocketWorldPosition();
-        Coordinate launchCoord = new Coordinate(initialLongitude, initialLatitude);
-        GeodeticComputationStrategy geodeticComputation = (simulation.getSimulatedConditions().toSimulationConditions()).getGeodeticComputation();
-
-        WorldCoordinate landingCoord = geodeticComputation.addCoordinate(coord, launchCoord);
-        WorldCoordinate diffCoord = differenceCoord(coord, landingCoord);
-
-        System.out.println();
-        System.out.println("angle: " + Math.toDegrees(simulation.getOptions().getLaunchRodAngle()));
-        System.out.println("wind speed: " + simulation.getOptions().getWindSpeedAverage());
-        System.out.println(coord);
-        System.out.println(landingCoord);
-        System.out.println(diffCoord);
-        System.out.println(coordToMeters(diffCoord));
-        System.out.println();
-
-        return coordToMeters(diffCoord);
-    }
-
-    public String getLandingCoord2(Simulation simulation){
-        double initialLatitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lat");
-        double initialLongitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lon");
-
-        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
-
-        Coordinate launchCoord = new Coordinate(initialLongitude, initialLatitude);
-        WorldCoordinate coord = new WorldCoordinate(flightDataBranch.getLast(TYPE_LONGITUDE), flightDataBranch.getLast(TYPE_LATITUDE), 0);
+        WorldCoordinate worldPos = status.getRocketWorldPosition();
+        Coordinate launchPosCoord = new Coordinate(simulation.getOptions().getLaunchLongitude(),simulation.getOptions().getLaunchLatitude());
 
         GeodeticComputationStrategy geodeticComputation = (simulation.getSimulatedConditions().toSimulationConditions()).getGeodeticComputation();
-        WorldCoordinate landingCoord = geodeticComputation.addCoordinate(coord, launchCoord);
-        WorldCoordinate diffCoord = differenceCoord(coord, landingCoord);
+        WorldCoordinate launch = geodeticComputation.addCoordinate(worldPos, launchPosCoord);
 
-        return coordToMeters(diffCoord);
+        WorldCoordinate launchPos = new WorldCoordinate(flightDataBranch.get(TYPE_LONGITUDE).get(0), flightDataBranch.get(TYPE_LATITUDE).get(0), 0);
+        WorldCoordinate landingPos = new WorldCoordinate(flightDataBranch.getLast(TYPE_LONGITUDE), flightDataBranch.getLast(TYPE_LATITUDE), 0);
+        WorldCoordinate diffPos = getifferenceBetweenCoords(launchPos, landingPos);
+
+        System.out.println("Geodetic coord: " + launch);
+        System.out.println("Launch pos " + launchPos);
+        System.out.println("Landing pos:  " + landingPos);
+        System.out.println("Diff pos:  " + diffPos);
+        System.out.println("Diff coord:  " + coordToMeters(diffPos));
+        System.out.println("Diff distance:  " + distFrom(launchPos.getLatitudeDeg(),launchPos.getLongitudeDeg(),
+                landingPos.getLatitudeDeg(), landingPos.getLongitudeDeg()));
+        System.out.println("Cartisian Coord: " + toCartisianCoord(diffPos));
+        System.out.println();
+
+        return coordToMeters(landingPos);
     }
 
-    public String getLandingCoord3(Simulation simulation){
-        //TODO: check these values are legit
-        double initialLatitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lat");
-        double initialLongitude = (double)((JSONObject)weatherDataJson.get("coord")).get("lon");
-
-        FlightDataBranch flightDataBranch = simulation.getSimulatedData().getBranch(0);
-
-        return String.format("(%f,%f)", (flightDataBranch.getLast(TYPE_LONGITUDE) - initialLongitude),
-                (flightDataBranch.getLast(TYPE_LATITUDE) - initialLatitude));
+    public String test(){
+        WorldCoordinate c1 = new WorldCoordinate(-41.288892, 174.776125, 0);
+        WorldCoordinate c2 = new WorldCoordinate(-41.288891, 174.776201,0);
+        return coordToMeters(getifferenceBetweenCoords(c1,c2));
     }
 
-    public WorldCoordinate differenceCoord(WorldCoordinate c1, WorldCoordinate c2){
+    public WorldCoordinate getifferenceBetweenCoords(WorldCoordinate c1, WorldCoordinate c2){
         double dlat = c2.getLatitudeDeg() - c1.getLatitudeDeg();
         double dlon = c2.getLongitudeDeg() - c1.getLongitudeDeg();
-        return new WorldCoordinate(dlat, dlon, 0);
+        return new WorldCoordinate(dlon, dlat, 0);
     }
 
     public String coordToMeters(WorldCoordinate c){
         double METERS_PER_DEGREE_LATITUDE = 111325; // "standard figure"
         double METERS_PER_DEGREE_LONGITUDE_EQUATOR = 111050;
+        double metersPerDegreeLongitude = METERS_PER_DEGREE_LONGITUDE_EQUATOR * Math.cos(c.getLatitudeRad());
         double earthRadius = 6371000; //meters
-        return String.format("(%f,%f)", c.getLongitudeDeg() * METERS_PER_DEGREE_LONGITUDE_EQUATOR, c.getLatitudeDeg() * METERS_PER_DEGREE_LATITUDE);
-        //return String.format("(%f,%f)", c.getLongitudeDeg()*1000, c.getLatitudeDeg()*1000);
+        return String.format("(%f,%f)", c.getLongitudeDeg()*metersPerDegreeLongitude, c.getLatitudeDeg()*METERS_PER_DEGREE_LATITUDE);
+    }
+
+    public static double distFrom(double lat1, double lng1, double lat2, double lng2) {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double dist = (earthRadius * c);
+
+        return dist;
+    }
+
+    public String toCartisianCoord(WorldCoordinate c){
+        double earthRadius = 6371000;
+        double lon = c.getLongitudeDeg();
+        double lat = c.getLatitudeDeg();
+
+        double x = earthRadius * Math.cos(lat) * Math.cos(lon);
+        double y = earthRadius * Math.cos(lat) * Math.sin(lon);
+
+        return String.format("(%f,%f)", x,y);
     }
 }
